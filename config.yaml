@@ -1,0 +1,48 @@
+data_dir: /app/data
+device: cpu
+# Timezone the web form's date pickers are read in; they send no offset.
+tz: "+07:00"
+sample_fps: 10
+imgsz: 640
+retention_days: 3
+
+tau:
+  osnet: 0.74           # tuned on Market-1501 TRAIN identities (disjoint from the reported test split)
+  clip: 0.25            # calibrated in the R13 evaluation
+
+tracklet:
+  lost_track_s: 2.0
+  min_tracklet_s: 1.0
+  max_tracklet_s: 60.0
+  merge_gap_s: 3.0
+  merge_sim: 0.8
+
+default_min_walk_s: 10.0
+
+cameras:
+  cam1:
+    name: Pi webcam
+    kind: rtsp
+    source_url: rtsp://host.docker.internal:8554/cam1
+    location: spot 1
+  cam2:
+    name: iPhone
+    kind: rtsp
+    source_url: rtsp://host.docker.internal:8554/cam2
+    location: spot 2
+  replay:
+    name: File replay (dev harness / demo fallback)
+    kind: rtsp
+    source_url: rtsp://host.docker.internal:8554/replay
+    location: replayed clip
+  replay2:
+    name: File replay 2 (second dev source)
+    kind: rtsp
+    source_url: rtsp://host.docker.internal:8554/replay2
+    location: replayed clip 2
+
+pairs:
+  - cameras: [cam1, cam2]
+    min_walk_s: 4.0     # replace with the measured walk time between spots
+  - cameras: [replay, replay2]
+    min_walk_s: 4.0
