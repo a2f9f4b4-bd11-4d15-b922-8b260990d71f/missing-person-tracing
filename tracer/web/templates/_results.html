@@ -1,0 +1,18 @@
+{% if matches %}
+<p><a href="/ui/searches/{{ search_id }}/timeline">Open timeline &rarr;</a></p>
+<div class="grid">
+  {% for m in matches %}{% include "_card.html" %}{% endfor %}
+</div>
+{% else %}
+<p class="note">
+  {% if reason == "none_above_tau" %}
+    No sighting passed the similarity threshold. Best score seen:
+    <span class="score">{{ "%.3f"|format(best_score) }}</span>.
+  {% elif reason == "all_rejected_by_timing" %}
+    Candidates were found but every one was impossible in time. Best score:
+    <span class="score">{{ "%.3f"|format(best_score) }}</span>.
+  {% else %}
+    No sightings at all in that time window and camera selection.
+  {% endif %}
+</p>
+{% endif %}

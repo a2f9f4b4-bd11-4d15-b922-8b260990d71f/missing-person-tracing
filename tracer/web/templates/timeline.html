@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Timeline — search {{ search_id }}</h2>
+<div id="lanes" hx-get="/ui/searches/{{ search_id }}/timeline?fragment=1"
+     hx-trigger="every 3s" hx-swap="innerHTML">
+  {% include "_lanes.html" %}
+</div>
+{% endblock %}

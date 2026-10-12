@@ -1,0 +1,15 @@
+{% for cam, sightings in lanes.items() %}
+<div class="lane">
+  <div>{{ cam }}</div>
+  <div class="track">
+    {% for s in sightings %}
+    <a class="sighting {{ s.status }}" href="{{ s.clip_url }}" target="_blank"
+       style="left: {{ s.left_pct }}%; width: {{ s.width_pct }}%"
+       title="{{ s.camera_id }} {{ s.started_at }} score {{ '%.3f'|format(s.score) }}"></a>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<p class="note">No confirmed or pending sightings yet.</p>
+{% endfor %}
+{% if last_seen %}<p>Last known location: <strong>{{ last_seen }}</strong></p>{% endif %}

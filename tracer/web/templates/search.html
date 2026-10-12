@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>New search</h2>
+<form hx-post="/ui/searches" hx-target="#results" hx-encoding="multipart/form-data">
+  <p><label>Reference photo <input type="file" name="photo" accept="image/*"></label></p>
+  <p><label>or description <input type="text" name="text" placeholder="red shirt, backpack"></label></p>
+  <p><label>From <input type="datetime-local" name="from"></label>
+     <label>To <input type="datetime-local" name="to"></label></p>
+  <fieldset>
+    <legend>Cameras</legend>
+    {% for c in cameras %}
+      <label><input type="checkbox" name="cameras" value="{{ c.id }}" checked>
+        {{ c.id }} — {{ c.name }}{% if c.location %} ({{ c.location }}){% endif %}</label><br>
+    {% endfor %}
+  </fieldset>
+  <p><button type="submit">Search</button></p>
+</form>
+<div id="results"></div>
+{% endblock %}

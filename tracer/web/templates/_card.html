@@ -1,0 +1,9 @@
+<div class="card" id="match-{{ m.tracklet_id }}">
+  <a href="{{ m.clip_url }}" target="_blank"><img src="{{ m.thumb_url }}" alt="sighting"></a>
+  <p>{{ m.camera_id }} · {{ m.started_at[11:19] }}<br>
+     <span class="score">{{ "%.3f"|format(m.score) }}</span> · {{ m.status }}</p>
+  <button hx-patch="/ui/searches/{{ search_id }}/matches/{{ m.tracklet_id }}?status=confirmed"
+          hx-target="#match-{{ m.tracklet_id }}" hx-swap="outerHTML">Confirm</button>
+  <button hx-patch="/ui/searches/{{ search_id }}/matches/{{ m.tracklet_id }}?status=rejected"
+          hx-target="#match-{{ m.tracklet_id }}" hx-swap="outerHTML">Reject</button>
+</div>
