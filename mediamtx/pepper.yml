@@ -1,0 +1,34 @@
+logLevel: info
+rtspAddress: :8554
+rtmpAddress: :1935
+srtAddress: :8890
+hlsDisable: yes
+webrtcDisable: yes
+
+paths:
+  cam1:
+    source: rtsp://raspberrypi.local:8554/cam1
+    sourceOnDemand: no
+
+  # Pushed by the iPhone running Larix:
+  #   srt://<pepper-ip>:8890?streamid=publish:cam2
+  # Larix publishes SRT reliably where iOS RTSP publishing does not.
+  cam2: {}
+
+  # Development harness and demo-night fallback: a recorded clip re-streamed
+  # in real time, so the live path works with no camera attached.
+  replay:
+    runOnInit: >
+      ffmpeg -re -stream_loop -1 -i /samples/people.mp4
+      -c:v libx264 -preset veryfast -tune zerolatency -g 30
+      -f rtsp rtsp://localhost:8554/replay
+    runOnInitRestart: yes
+
+  # Second replay source, so two workers can be exercised concurrently with no
+  # hardware attached (different clip, so the streams are genuinely distinct).
+  replay2:
+    runOnInit: >
+      ffmpeg -re -stream_loop -1 -i /samples/aisle.mp4
+      -c:v libx264 -preset veryfast -tune zerolatency -g 30
+      -f rtsp rtsp://localhost:8554/replay2
+    runOnInitRestart: yes
