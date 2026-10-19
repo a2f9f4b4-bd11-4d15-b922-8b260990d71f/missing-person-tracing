@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import timedelta, timezone
 from pathlib import Path
 
 import yaml
@@ -61,6 +62,16 @@ class Config:
         if pair.overlapping:
             return 0.0
         return pair.min_walk_s
+
+    @property
+    def tzinfo(self) -> timezone:
+        """The zone naive form input is read in, and times are displayed in."""
+        tz = self.tz.strip()
+        if tz.upper() == "UTC":
+            return timezone.utc
+        sign = -1 if tz.startswith("-") else 1
+        hours, _, minutes = tz.lstrip("+-").partition(":")
+        return timezone(timedelta(hours=int(hours), minutes=int(minutes or 0)) * sign)
 
     def overlapping(self, a: str, b: str) -> bool:
         """Whether two cameras see shared space, so simultaneous sightings of

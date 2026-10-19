@@ -45,9 +45,10 @@ class StatusPatch(BaseModel):
     status: str
 
 
-def _match_json(m: Match) -> dict:
+def _match_json(m: Match, tz: timezone = timezone.utc) -> dict:
     return {"tracklet_id": m.tracklet_id, "camera_id": m.camera_id,
-            "started_at": m.started_at.isoformat(), "ended_at": m.ended_at.isoformat(),
+            "started_at": m.started_at.astimezone(tz).isoformat(),
+            "ended_at": m.ended_at.astimezone(tz).isoformat(),
             "score": round(m.score, 4), "thumb_url": m.thumb_url,
             "clip_url": m.clip_url, "status": m.status}
 
@@ -62,13 +63,7 @@ def _parse_window(value, cfg: Config) -> datetime | None:
     moment = value if isinstance(value, datetime) else datetime.fromisoformat(value)
     if moment.tzinfo is not None:
         return moment
-    tz = cfg.tz.strip()
-    if tz.upper() == "UTC":
-        return moment.replace(tzinfo=timezone.utc)
-    sign = -1 if tz.startswith("-") else 1
-    hours, _, minutes = tz.lstrip("+-").partition(":")
-    offset = timedelta(hours=int(hours), minutes=int(minutes or 0)) * sign
-    return moment.replace(tzinfo=timezone(offset))
+    return moment.replace(tzinfo=cfg.tzinfo)
 
 
 def _validate_scope(cfg: Config, cameras: list[str],
@@ -158,7 +153,8 @@ def get_matches(search_id: int, limit: int = 10,
     result = run_search(store, cfg, s["embedding"], s["space"], s["window"],
                         scope, limit=limit)
     store.record_matches(search_id, [(m.tracklet_id, m.score) for m in result.matches])
-    return {"matches": [_match_json(m) for m in store.get_matches(search_id, limit)],
+    return {"matches": [_match_json(m, cfg.tzinfo)
+                        for m in store.get_matches(search_id, limit)],
             "reason": result.reason, "best_score": result.best_score}
 
 
@@ -173,13 +169,16 @@ def patch_match(search_id: int, tracklet_id: int, patch: StatusPatch,
 
 
 @app.get("/api/searches/{search_id}/timeline")
-def get_timeline(search_id: int, store: Store = Depends(get_store)) -> dict:
+def get_timeline(search_id: int, cfg: Config = Depends(get_config),
+                 store: Store = Depends(get_store)) -> dict:
     _load_search(store, search_id)
     lanes = store.timeline(search_id)
-    return {"lanes": {cam: [_match_json(m) for m in ms] for cam, ms in lanes.items()}}
+    return {"lanes": {cam: [_match_json(m, cfg.tzinfo) for m in ms]
+                      for cam, ms in lanes.items()}}
 
 
-def _lane_geometry(lanes: dict[str, list[Match]]) -> tuple[dict, str | None]:
+def _lane_geometry(lanes: dict[str, list[Match]],
+                   tz: timezone = timezone.utc) -> tuple[dict, str | None]:
     """Position each sighting on a shared time axis as percentages."""
     everything = [m for ms in lanes.values() for m in ms]
     if not everything:
@@ -193,11 +192,12 @@ def _lane_geometry(lanes: dict[str, list[Match]]) -> tuple[dict, str | None]:
         for m in ms:
             left = (m.started_at - t0).total_seconds() / span * 100.0
             width = max((m.ended_at - m.started_at).total_seconds() / span * 100.0, 1.0)
-            d = _match_json(m)
+            d = _match_json(m, tz)
             d.update(left_pct=round(left, 2), width_pct=round(min(width, 100 - left), 2))
             out[cam].append(d)
     newest = max(everything, key=lambda m: m.ended_at)
-    return out, f"{newest.camera_id} at {newest.ended_at.isoformat(timespec='seconds')}"
+    return out, (f"{newest.camera_id} at "
+                 f"{newest.ended_at.astimezone(tz).isoformat(timespec='seconds')}")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -235,19 +235,21 @@ async def ui_create_search(request: Request,
 
 @app.patch("/ui/searches/{search_id}/matches/{tracklet_id}", response_class=HTMLResponse)
 def ui_patch_match(request: Request, search_id: int, tracklet_id: int, status: str,
+                   cfg: Config = Depends(get_config),
                    store: Store = Depends(get_store)):
     patch_match(search_id, tracklet_id, StatusPatch(status=status), store)
     if status == "rejected":
         return HTMLResponse("")
     m = next(m for m in store.get_matches(search_id, 50) if m.tracklet_id == tracklet_id)
-    return TEMPLATES.TemplateResponse(request, "_card.html",
-                                      {"search_id": search_id, "m": _match_json(m)})
+    return TEMPLATES.TemplateResponse(
+        request, "_card.html", {"search_id": search_id, "m": _match_json(m, cfg.tzinfo)})
 
 
 @app.get("/ui/searches/{search_id}/timeline", response_class=HTMLResponse)
 def ui_timeline(request: Request, search_id: int, fragment: int = 0,
+                cfg: Config = Depends(get_config),
                 store: Store = Depends(get_store)):
-    lanes, last_seen = _lane_geometry(store.timeline(search_id))
+    lanes, last_seen = _lane_geometry(store.timeline(search_id), cfg.tzinfo)
     ctx = {"search_id": search_id, "lanes": lanes, "last_seen": last_seen}
     name = "_lanes.html" if fragment else "timeline.html"
     return TEMPLATES.TemplateResponse(request, name, ctx)

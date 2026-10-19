@@ -131,3 +131,23 @@ def test_a_naive_form_time_is_read_in_the_configured_timezone(client, store, cfg
         "SELECT window_from, window_to FROM search ORDER BY id DESC LIMIT 1").fetchone()
     assert frm.utcoffset().total_seconds() != 0 or frm.hour == 7, \
         f"14:00 at +07:00 should be 07:00Z, got {frm.isoformat()}"
+
+
+def test_times_are_displayed_in_the_configured_timezone(client, store, cfg):
+    """Ingesting at 09:00+07:00 stores 02:00Z. A reviewer in +07:00 should
+    read 09:00 on the card, not the raw UTC instant."""
+    import dataclasses
+    tz_cfg = dataclasses.replace(cfg, tz="+07:00", data_dir=cfg.data_dir)
+    app.dependency_overrides[get_config] = lambda: tz_cfg
+
+    store.insert_tracklet(make_tracklet(
+        camera_id="cam1", embedding=make_similar_embedding(QUERY, 0.95),
+        started_at=datetime(2026, 10, 19, 2, 0, 15, tzinfo=timezone.utc),
+        ended_at=datetime(2026, 10, 19, 2, 0, 20, tzinfo=timezone.utc),
+        thumb_path="thumbs/1.jpg", clip_path="clips/1.mp4"))
+
+    sid = client.post("/api/searches", files=photo(),
+                      data={"cameras": ["cam1"]}).json()["search_id"]
+    r = client.get(f"/ui/searches/{sid}/results")
+    assert "09:00:15" in r.text, "card should show local time"
+    assert "02:00:15" not in r.text, "card still shows the raw UTC instant"
