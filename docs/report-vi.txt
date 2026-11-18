@@ -2,12 +2,13 @@ TRUY TÌM NGƯỜI MẤT TÍCH
 BÁO CÁO DỰ ÁN
 
 Đề tài #15 — Mini Projects
-Sinh viên:  ______________________
-MSSV:       ______________________
-Lớp:        ______________________
-Ngày:       Tháng 10/2026
+Nhóm thực hiện:
+  Nguyễn Danh Thái    K24DTCN493    D24TXCN12-K
+  Nguyễn Khánh Duy    K24DTCN289    D24TXCN06-K
 
-Mã nguồn: https://github.com/<account>/missing-person-tracing
+Ngày: Tháng 10/2026
+
+Mã nguồn: https://github.com/a2f9f4b4-bd11-4d15-b922-8b260990d71f/missing-person-tracing
 
 ====================================================================
 
@@ -134,6 +135,67 @@ Thông lượng
   GPU, 720p, hai worker  11,4 + 11,5 = 22,9 tổng cộng
 
 Hai tiến trình worker cho tổng thông lượng cao hơn một tiến trình, nghĩa là một worker chưa làm GPU đạt tải tối đa. Hai camera ở 10 fps cần tổng 20 fps, còn khoảng 15% dư.
+
+
+Demo tổng hợp — một ảnh trên toàn bộ kho dữ liệu
+
+Đây là phép thử sát nhất với mục đích của hệ thống: dùng một ảnh để thu hẹp một
+kho dữ liệu lớn gồm nhiều người đã được phát hiện.
+
+Kho dữ liệu lúc demo gồm 929 lần xuất hiện:
+
+  Nguồn                                      Số lần xuất hiện
+  -----------------------------------------  ----------------
+  Market-1501 (200 danh tính, 6 camera thật)  901
+  Camera của dự án (cam1, cam2, webcam)       28
+  Tổng                                        929
+
+Kết quả khi tìm bằng một ảnh tham chiếu, phạm vi toàn bộ 9 camera:
+
+  929 lần xuất hiện trong kho
+    → 170 vượt ngưỡng τ = 0,50
+    → 10 kết quả hiển thị cho người kiểm duyệt
+
+  Hạng  Camera  Điểm   Nhận xét
+  ----  ------  -----  ----------------------
+  1     cam1    0,902  đúng người
+  2     cam2    0,902  đúng người
+  3     cam1    0,718  đúng người
+  4     cam2    0,718  đúng người
+  5     webcam  0,669  đúng người
+  6     cam1    0,649  đúng người
+  7     cam2    0,649  đúng người
+  8     m4      0,647  Market-1501 (người lạ)
+  9     m1      0,646  Market-1501 (người lạ)
+  10    cam1    0,642  đúng người
+
+8 trong 10 kết quả đầu là đúng người; người lạ đầu tiên chỉ xuất hiện ở hạng 8.
+Người kiểm duyệt phải xem 10 ảnh thu nhỏ thay vì 929 — giảm khoảng 99%. Đây
+chính là giá trị cốt lõi của hệ thống: không phải khẳng định danh tính, mà thu
+hẹp phạm vi cần xem xét.
+
+Lưu ý trung thực: ảnh tham chiếu trong demo này được tạo từ ảnh thu nhỏ của
+chính một tracklet, nên đây là phép thử "thông mạch" (smoke test) chứng minh
+toàn bộ pipeline hoạt động, chứ không chứng minh khả năng tổng quát hoá. Phép đo
+tổng quát hoá nằm ở Mức 1 và Mức 2 bên trên.
+
+Các kiểm tra đầu vào sai (chạy trên server thật)
+
+  Đầu vào                           Kết quả mong đợi                 Thực tế
+  --------------------------------  -------------------------------  -------
+  Ảnh không có người                422 + thông báo dễ hiểu          Đúng
+  Khoảng thời gian đảo ngược        422                              Đúng
+  /media/../etc/passwd              404 (từ chối thoát thư mục)      Đúng
+  Camera không tồn tại (cam9)       422, nêu rõ tên camera           Đúng
+
+Ingest trực tiếp từ webcam USB
+
+  Chỉ số                        Giá trị
+  ----------------------------  -----------------------------
+  Số lần xuất hiện phát hiện    14
+  Kích thước crop               khoảng 500 × 680 px
+  Số crop mỗi tracklet          10 (đạt mức tối đa)
+  Độ trễ đến khi tìm được       trung vị 2,13 s
 
 ====================================================================
 

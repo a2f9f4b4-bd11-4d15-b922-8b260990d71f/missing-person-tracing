@@ -5,7 +5,7 @@
 Tìm kiếm người mất tích trong dữ liệu camera giám sát chỉ từ một ảnh tham
 chiếu, sử dụng tái định danh (re-identification) toàn thân qua nhiều camera.
 
-Mã nguồn: `https://github.com/<account>/missing-person-tracing`
+Mã nguồn: `https://github.com/a2f9f4b4-bd11-4d15-b922-8b260990d71f/missing-person-tracing`
 
 ---
 

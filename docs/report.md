@@ -2,10 +2,15 @@
 
 **Topic #15, Mini Projects** · Oct 2026
 
+| Member | Student ID | Class |
+|---|---|---|
+| Nguyễn Danh Thái | K24DTCN493 | D24TXCN12-K |
+| Nguyễn Khánh Duy | K24DTCN289 | D24TXCN06-K |
+
 Searching CCTV footage for a missing person from a single reference photo, using
 whole-body re-identification across multiple cameras.
 
-Code: `https://github.com/<account>/missing-person-tracing`
+Code: `https://github.com/a2f9f4b4-bd11-4d15-b922-8b260990d71f/missing-person-tracing`
 
 ---
 
@@ -172,6 +177,68 @@ means GPU headroom buys more cameras or higher resolution, not lower latency.
 Two worker processes produce more aggregate throughput than one, so a single
 worker does not saturate the GPU. Two cameras at 10 fps need 20 fps aggregate,
 leaving roughly 15% headroom.
+
+### Demo — one photo against the whole gallery
+
+The test closest to the system's actual purpose: using one photo to narrow a
+large set of already-detected people.
+
+The gallery at demo time held 929 sightings:
+
+| Source | Sightings |
+|---|---|
+| Market-1501 (200 identities, 6 real cameras) | 901 |
+| Project cameras (cam1, cam2, webcam) | 28 |
+| **Total** | **929** |
+
+Searching with one reference photo, scoped to all 9 cameras:
+
+```
+929 sightings in the gallery
+  → 170 above the threshold τ = 0.50
+  → 10 shown to the reviewer
+```
+
+| Rank | Camera | Score | |
+|---|---|---|---|
+| 1 | cam1 | 0.902 | correct person |
+| 2 | cam2 | 0.902 | correct person |
+| 3 | cam1 | 0.718 | correct person |
+| 4 | cam2 | 0.718 | correct person |
+| 5 | webcam | 0.669 | correct person |
+| 6 | cam1 | 0.649 | correct person |
+| 7 | cam2 | 0.649 | correct person |
+| 8 | m4 | 0.647 | Market-1501 stranger |
+| 9 | m1 | 0.646 | Market-1501 stranger |
+| 10 | cam1 | 0.642 | correct person |
+
+8 of the top 10 are the right person, and the first stranger appears only at
+rank 8. The reviewer inspects 10 thumbnails instead of 929 — a reduction of
+roughly 99%. That is the system's core value: not asserting an identity, but
+narrowing what has to be looked at.
+
+**Honest caveat.** The reference photo here was built from one tracklet's own
+thumbnail, so this is a smoke test proving the pipeline works end to end, not a
+test of generalisation. Generalisation is measured in Tiers 1 and 2 above.
+
+### Malformed-input checks (against the running server)
+
+| Input | Expected | Actual |
+|---|---|---|
+| Photo containing no person | 422 with a readable message | correct |
+| Reversed time window | 422 | correct |
+| `/media/../etc/passwd` | 404, traversal refused | correct |
+| Unknown camera (`cam9`) | 422 naming the camera | correct |
+
+### Live USB webcam ingest
+
+| Metric | Value |
+|---|---|
+| Sightings detected | 14 |
+| Crop size | ~500 × 680 px |
+| Crops per tracklet | 10 (the maximum) |
+| Time to searchable | 2.13 s median |
+
 
 ## 5. Does the signal actually work?
 
