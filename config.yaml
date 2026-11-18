@@ -7,7 +7,8 @@ imgsz: 640
 retention_days: 3
 
 tau:
-  osnet: 0.74           # tuned on Market-1501 TRAIN identities (disjoint from the reported test split)
+  osnet: 0.50           # favours recall: a missed sighting costs more than a wasted clip view
+                        # (0.74 maximised precision; see docs/evaluation.md for the sweep)
   clip: 0.25            # calibrated in the R13 evaluation
 
 tracklet:
@@ -40,6 +41,11 @@ cameras:
     kind: rtsp
     source_url: rtsp://host.docker.internal:8554/replay2
     location: replayed clip 2
+  webcam:
+    name: USB webcam (live demo)
+    kind: rtsp
+    source_url: rtsp://host.docker.internal:8554/webcam
+    location: demo spot
 
 pairs:
   - cameras: [cam1, cam2]

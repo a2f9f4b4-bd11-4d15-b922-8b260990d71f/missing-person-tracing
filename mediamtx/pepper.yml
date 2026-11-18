@@ -32,3 +32,7 @@ paths:
       -c:v libx264 -preset veryfast -tune zerolatency -g 30
       -f rtsp rtsp://localhost:8554/replay2
     runOnInitRestart: yes
+
+  # USB webcam on pepper, published from the host by ffmpeg (see README).
+  # Host-side publishing avoids passing /dev/video0 into the container.
+  webcam: {}
