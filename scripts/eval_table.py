@@ -69,6 +69,26 @@ def main() -> None:
             L.append(f"| {r['tau']:.2f}{mark} | {pct(r['top1'])} | "
                      f"{pct(r['top5'])} | {r['false_positives']} |")
         best_top1 = max(r["top1"] for r in sweep["rows"])
+
+        # The sweep's own rule maximises selectivity; config may deliberately
+        # choose a lower tau to favour recall. Say which value actually ships.
+        try:
+            import yaml
+            configured = yaml.safe_load(Path("config.yaml").read_text())["tau"]["osnet"]
+        except Exception:
+            configured = None
+        if configured is not None and configured != sweep.get("best_tau"):
+            row = next((r for r in sweep["rows"] if r["tau"] == configured), None)
+            L += ["",
+                  f"**The shipped value is tau = {configured}**, not the "
+                  f"{sweep['best_tau']} this sweep's selectivity rule picks."]
+            if row:
+                L += [f"At {configured} the system reaches {pct(row['top1'])} top-1 and "
+                      f"{pct(row['top5'])} top-5 with {row['false_positives']} wrong "
+                      "matches returned. The lower threshold is deliberate: a missed "
+                      "sighting costs more than a wasted clip view, so recall is "
+                      "preferred over a tidy result list."]
+
         L += ["",
               f"Best top-1 is {pct(best_top1)}, against the product spec's target of "
               f"{pct(TARGET_TOP1)}: "

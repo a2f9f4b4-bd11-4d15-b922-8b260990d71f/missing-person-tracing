@@ -34,6 +34,9 @@ Tuned on **bounding_box_train** — identities disjoint from the reported split.
 | 0.86 | 32.7% | 34.0% | 18 |
 | 0.90 | 10.0% | 11.3% | 5 |
 
+**The shipped value is tau = 0.5**, not the 0.74 this sweep's selectivity rule picks.
+At 0.5 the system reaches 69.3% top-1 and 85.3% top-5 with 467 wrong matches returned. The lower threshold is deliberate: a missed sighting costs more than a wasted clip view, so recall is preferred over a tidy result list.
+
 Best top-1 is 69.3%, against the product spec's target of 80.0%: **NOT met**.
 
 The false-positive column counts non-matching tracklets inside a
@@ -54,7 +57,7 @@ with reference photos taken separately from the clips.
 
 ## R8 — live latency
 
-154 live measurements. Median 2.63s, worst 5.63s, against a
+17 live measurements. Median 2.13s, worst 2.18s, against a
 10s requirement: **PASS**.
 
 Recorded-file ingestion is excluded: its timestamps are the
