@@ -1,0 +1,27 @@
+=== Kho dữ liệu / Gallery contents ===
+  cam1        7
+  cam2        7
+  m1        173
+  m2        158
+  m3        174
+  m4         86
+  m5        166
+  m6        144
+  -------------
+  Market-1501 (strangers)  901
+  project cameras          14
+  TOTAL                    915
+
+=== scripts/search_cli.py data/reference.jpg (scope: cam1 cam2) ===
+2 person(s) detected; using the largest (24628 px2)
+rank camera    started                    score   tracklet
+1    cam1      2026-11-18T12:59:20+00:00  0.902   946
+2    cam2      2026-11-18T13:09:20+00:00  0.902   953
+3    cam1      2026-11-18T12:59:48+00:00  0.718   950
+4    cam2      2026-11-18T13:09:48+00:00  0.718   957
+5    cam1      2026-11-18T12:59:33+00:00  0.649   947
+6    cam2      2026-11-18T13:09:33+00:00  0.649   954
+7    cam1      2026-11-18T12:59:33+00:00  0.642   949
+8    cam2      2026-11-18T13:09:33+00:00  0.642   956
+9    cam1      2026-11-18T12:59:06+00:00  0.620   944
+10   cam2      2026-11-18T13:09:06+00:00  0.620   951

@@ -1,0 +1,19 @@
+=== scripts/ingest_file.py — cam1 ===
+INFO new tracklet 944 on cam1 (4.1s, 10 crops)
+INFO new tracklet 945 on cam1 (4.8s, 10 crops)
+INFO new tracklet 946 on cam1 (5.7s, 10 crops)
+INFO new tracklet 947 on cam1 (5.0s, 10 crops)
+INFO new tracklet 948 on cam1 (3.8s, 10 crops)
+INFO new tracklet 949 on cam1 (5.2s, 10 crops)
+INFO new tracklet 950 on cam1 (2.7s, 10 crops)
+wrote 7 tracklet(s) for cam1
+
+=== scripts/ingest_file.py — cam2 ===
+INFO new tracklet 951 on cam2 (4.1s, 10 crops)
+INFO new tracklet 952 on cam2 (4.8s, 10 crops)
+INFO new tracklet 953 on cam2 (5.7s, 10 crops)
+INFO new tracklet 954 on cam2 (5.0s, 10 crops)
+INFO new tracklet 955 on cam2 (3.8s, 10 crops)
+INFO new tracklet 956 on cam2 (5.2s, 10 crops)
+INFO new tracklet 957 on cam2 (2.7s, 10 crops)
+wrote 7 tracklet(s) for cam2

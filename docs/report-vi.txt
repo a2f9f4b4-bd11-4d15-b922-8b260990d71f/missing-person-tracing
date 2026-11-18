@@ -142,42 +142,51 @@ Demo tổng hợp — một ảnh trên toàn bộ kho dữ liệu
 Đây là phép thử sát nhất với mục đích của hệ thống: dùng một ảnh để thu hẹp một
 kho dữ liệu lớn gồm nhiều người đã được phát hiện.
 
-Kho dữ liệu lúc demo gồm 929 lần xuất hiện:
+Kho dữ liệu lúc demo gồm 915 lần xuất hiện:
 
   Nguồn                                      Số lần xuất hiện
   -----------------------------------------  ----------------
   Market-1501 (200 danh tính, 6 camera thật)  901
-  Camera của dự án (cam1, cam2, webcam)       28
-  Tổng                                        929
+  Camera của dự án (cam1, cam2)               14
+  Tổng                                        915
 
 Kết quả khi tìm bằng một ảnh tham chiếu, phạm vi toàn bộ 9 camera:
 
-  929 lần xuất hiện trong kho
-    → 170 vượt ngưỡng τ = 0,50
+  915 lần xuất hiện trong kho
+    → 159 vượt ngưỡng τ = 0,50
     → 10 kết quả hiển thị cho người kiểm duyệt
 
-  Hạng  Camera  Điểm   Nhận xét
-  ----  ------  -----  ----------------------
-  1     cam1    0,902  đúng người
-  2     cam2    0,902  đúng người
-  3     cam1    0,718  đúng người
-  4     cam2    0,718  đúng người
-  5     webcam  0,669  đúng người
-  6     cam1    0,649  đúng người
-  7     cam2    0,649  đúng người
-  8     m4      0,647  Market-1501 (người lạ)
-  9     m1      0,646  Market-1501 (người lạ)
-  10    cam1    0,642  đúng người
+  Hạng  Camera  Điểm   Đúng người?
+  ----  ------  -----  -----------------------------
+  1     cam1    0,902  ĐÚNG — người trong ảnh truy vấn
+  2     cam2    0,902  ĐÚNG — cùng người, camera khác
+  3     cam1    0,718  người khác
+  4     cam2    0,718  người khác
+  5     cam1    0,649  người khác
+  6     cam2    0,649  người khác
+  7     m4      0,647  người khác (Market-1501)
+  8     m1      0,646  người khác (Market-1501)
+  9     cam1    0,642  người khác
+  10    cam2    0,642  người khác
 
-8 trong 10 kết quả đầu là đúng người; người lạ đầu tiên chỉ xuất hiện ở hạng 8.
-Người kiểm duyệt phải xem 10 ảnh thu nhỏ thay vì 929 — giảm khoảng 99%. Đây
-chính là giá trị cốt lõi của hệ thống: không phải khẳng định danh tính, mà thu
-hẹp phạm vi cần xem xét.
+Ảnh minh hoạ kèm theo: docs/demo/top10.png (ảnh truy vấn và 10 ảnh thu nhỏ
+kết quả, có thể đối chiếu bằng mắt).
+
+Chỉ 2 trong 10 kết quả là đúng người. Clip mẫu chứa nhiều người đi bộ khác
+nhau, nên phần lớn kết quả còn lại là người khác trong cùng đoạn video, cộng
+thêm 2 người lạ từ Market-1501.
+
+Điều quan trọng nằm ở THỨ HẠNG chứ không phải số lượng kết quả đúng: đúng
+người đứng hạng 1 và 2 với điểm 0,902, cách biệt rõ rệt so với 0,718 của kết
+quả tiếp theo. Khoảng cách điểm này chính là tín hiệu mà người kiểm duyệt dựa
+vào. Người kiểm duyệt xem 10 ảnh thu nhỏ thay vì 915 (giảm 98,9%), và người
+cần tìm nằm ngay đầu danh sách — đó là giá trị cốt lõi của hệ thống: thu hẹp
+phạm vi cần xem xét, không phải khẳng định danh tính.
 
 Lưu ý trung thực: ảnh tham chiếu trong demo này được tạo từ ảnh thu nhỏ của
 chính một tracklet, nên đây là phép thử "thông mạch" (smoke test) chứng minh
-toàn bộ pipeline hoạt động, chứ không chứng minh khả năng tổng quát hoá. Phép đo
-tổng quát hoá nằm ở Mức 1 và Mức 2 bên trên.
+toàn bộ pipeline hoạt động, chứ không chứng minh khả năng tổng quát hoá. Phép
+đo tổng quát hoá nằm ở Mức 1 và Mức 2 bên trên.
 
 Các kiểm tra đầu vào sai (chạy trên server thật)
 

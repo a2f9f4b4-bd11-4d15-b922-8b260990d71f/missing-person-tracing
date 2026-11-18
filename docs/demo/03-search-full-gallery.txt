@@ -1,0 +1,30 @@
+=== Tìm trên TOÀN BỘ kho (915 lần xuất hiện, 9 camera) ===
+  tau = 0.5   weights = osnet_ain_x1_0_msmt17.pth
+  915 lần xuất hiện trong kho
+    -> 159 vượt ngưỡng tau
+    -> 10 hiển thị cho người kiểm duyệt
+
+  hạng  camera   điểm
+  1  cam1  0.902
+  2  cam2  0.902
+  3  cam1  0.718
+  4  cam2  0.718
+  5  cam1  0.649
+  6  cam2  0.649
+     7  m4       0.647
+     8  m1       0.646
+  9  cam1  0.642
+  10  cam2  0.642
+
+  => nguoi kiem duyet xem 10 anh thay vi 915 (giam 98.9%)
+
+  LƯU Ý QUAN TRỌNG (đã kiểm tra bằng mắt trên docs/demo/top10.png):
+  Chỉ #1 và #2 (0,902) là ĐÚNG NGƯỜI trong ảnh truy vấn — cùng một người
+  xuất hiện trên cả hai camera. Các kết quả từ 0,718 trở xuống là NHỮNG
+  NGƯỜI KHÁC: clip mẫu chứa nhiều người đi bộ, nên "cùng camera" không có
+  nghĩa là "cùng người".
+
+  Giá trị thực tế của hệ thống nằm ở THỨ HẠNG, không phải ở số lượng kết
+  quả đúng: đúng người đứng hạng 1-2 với điểm 0,902, cách biệt rõ so với
+  0,718 của người tiếp theo. Người kiểm duyệt xem 10 ảnh thay vì 915, và
+  người cần tìm nằm ngay đầu danh sách.

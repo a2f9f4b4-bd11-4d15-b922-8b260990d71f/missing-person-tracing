@@ -13,6 +13,7 @@ match is a suggestion with a score; a human confirms or rejects each one.
 - Technical spec: `Missing Person Tracing — Technical Spec.md`
 - Design: `docs/design.md`
 - Báo cáo dự án: `docs/report-vi.txt`
+- Demo evidence: `docs/demo/` (terminal captures + `top10.png`)
 - Results: `docs/evaluation.md` (generated — do not hand-edit)
 - Demo steps: `docs/demo-runbook.md`
 - Validate it yourself: `docs/validation.md`
